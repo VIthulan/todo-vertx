@@ -1,6 +1,7 @@
 package io.vertx.todo;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerResponse;
@@ -10,10 +11,12 @@ import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.util.DBclient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -21,29 +24,13 @@ public class Server extends AbstractVerticle {
 
     private static final Log log = LogFactory.getLog(Server.class);
 
-    private Map<Integer, Tasks> TasksMap = new HashMap<>();
+    private DBclient dBclient;
     private MongoClient mongoClient;
 
     @Override
     public void start(Future<Void> fut) throws Exception {
-       createData();
-
-        JsonObject config = Vertx.currentContext().config();
-
-        String uri = config.getString("mongo_uri");
-        if (uri == null) {
-            uri = "mongodb://localhost:27017";
-        }
-        String db = config.getString("mongo_db");
-        if (db == null) {
-            db = "task_db";
-        }
-
-        JsonObject mongoconfig = new JsonObject()
-                .put("connection_string", uri)
-                .put("db_name", db);
-        mongoClient = MongoClient.createShared(vertx, mongoconfig);
-
+        dBclient = new DBclient();
+        mongoClient = dBclient.init(vertx);
 
         Router router = Router.router(vertx);
         router.route("/").handler(routingContext -> {
@@ -53,32 +40,16 @@ public class Server extends AbstractVerticle {
                     .end("<h1>Welcome to my Todo API from Vertx</h1>");
         });
 
-//        router.route("/assets/*").handler(StaticHandler.create("assets"));
-
         router.get("/api/tasks").handler(this::getAllTasks);
         router.route("/api/tasks*").handler(BodyHandler.create());
         router.post("/api/tasks").handler(this::addTask);
         router.delete("/api/tasks/:id").handler(this::deleteTask);
-        router.put("/api/tasks/:id").handler(this::isDone);
+        router.put("/api/tasks/:id").handler(this::completed);
 
-        /*JsonObject taskJson = new JsonObject()
-                .put("_id",111)
-                .put("task", "TestingMongo")
-                .put("isDone",false);
-
-        mongoClient.save("tasks", taskJson, res -> {
-            if (res.succeeded()) {
-                log.info("Successfully inserted: " + res.result());
-            }
-        });*/
-
-        // Create the HTTP server and pass the "accept" method to the request handler.
         vertx
                 .createHttpServer()
                 .requestHandler(router::accept)
                 .listen(
-                        // Retrieve the port from the configuration,
-                        // default to 8080.
                         config().getInteger("http.port", 8080),
                         result -> {
                             if (result.succeeded()) {
@@ -91,15 +62,37 @@ public class Server extends AbstractVerticle {
     }
 
     private void getAllTasks(RoutingContext routingContext) {
-        routingContext.response()
-                .putHeader("content-type", "application/json; charset=utf-8")
-                .end(Json.encodePrettily(TasksMap.values()));
+        Map<String, Tasks> tasksMap = new HashMap<>();
+        JsonObject query = new JsonObject();
+        JsonObject jsonObject = new JsonObject();
+        mongoClient.find("tasks", query, res -> {
+            if (res.succeeded()) {
+                log.info("Getting all data");
+                for (JsonObject json : res.result()) {
+                    Tasks tasks = new Tasks();
+                    tasks.setCompleted(json.getBoolean("completed"));
+                    tasks.setTask(json.getString("task"));
+                    tasksMap.put(json.getString("_id"), tasks);
+                    jsonObject.mergeIn(json);
+                    log.info(json.encodePrettily());
+                }
+                routingContext.response()
+                        .putHeader("content-type", "application/json; charset=utf-8")
+                        .end(Json.encodePrettily(tasksMap));
+
+            } else {
+                res.cause().printStackTrace();
+                log.error("Error while retrieving all data");
+                log.error(res.cause());
+            }
+        });
+
     }
 
     private void addTask(RoutingContext routingContext) {
         Tasks task = Json.decodeValue(routingContext.getBodyAsString(),
                 Tasks.class);
-        TasksMap.put(task.getId(), task);
+        dBclient.addData(mongoClient, task);
 
         routingContext.response()
                 .setStatusCode(201)
@@ -112,49 +105,21 @@ public class Server extends AbstractVerticle {
         if (id == null) {
             routingContext.response().setStatusCode(400).end();
         } else {
-            Integer idAsInteger = Integer.valueOf(id);
-            TasksMap.remove(idAsInteger);
+            dBclient.removeData(mongoClient, id);
         }
         routingContext.response().setStatusCode(204).end();
     }
 
-    private void isDone(RoutingContext routingContext) {
+    private void completed(RoutingContext routingContext) {
         final String id = routingContext.request().getParam("id");
-        JsonObject json = routingContext.getBodyAsJson();
-        if (id == null || json == null) {
+        //JsonObject json = routingContext.getBodyAsJson();
+        if (id == null ) {
             routingContext.response().setStatusCode(400).end();
         } else {
-            final Integer idAsInteger = Integer.valueOf(id);
-            Tasks tasks = TasksMap.get(idAsInteger);
-            if (tasks == null) {
-                routingContext.response().setStatusCode(404).end();
-            } else {
-                tasks.setIsDone(json.getBoolean("isDone"));
-                routingContext.response()
-                        .putHeader("content-type", "application/json; charset=utf-8")
-                        .end(Json.encodePrettily(tasks));
-            }
+            dBclient.modifyData(mongoClient, id);
+            routingContext.response()
+                    .setStatusCode(200)
+                    .end();
         }
-    }
-
-    private void createData(){
-        Tasks tasks = new Tasks("GSoC at VertX",true);
-        /*JsonObject taskJson = new JsonObject()
-                .put("_id",tasks.getId())
-                .put("task", tasks.getTask())
-                .put("isDone",tasks.getIsDone());*/
-
-        /*JsonObject taskJson = new JsonObject()
-                .put("_id",111)
-                .put("task", "TestingMongo")
-                .put("isDone",false);
-
-        mongoClient.save("tasks", taskJson, res -> {
-                    if (res.succeeded()) {
-                        log.info("Successfully inserted: " + res.result());
-                    }
-                });*/
-
-                TasksMap.put(tasks.getId(), tasks);
     }
 }

@@ -3,25 +3,31 @@ package io.vertx.todo;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Tasks {
-    private static final AtomicInteger COUNTER = new AtomicInteger();
-    private int id = 0;
-    private boolean isDone;
+    private boolean completed;
     private String task;
 
-    public Tasks(String task,boolean isDone){
-        this.isDone = isDone;
+    public Tasks(String task, boolean completed) {
+        this.completed = completed;
         this.task = task;
-        id = COUNTER.getAndIncrement();
     }
 
-    public Tasks(){
-        this.id=COUNTER.getAndIncrement();
+    public Tasks() {
     }
 
-    public void setTask(String task){this.task=task;}
-    public void setIsDone(boolean isDone){this.isDone=isDone;}
+    public void setTask(String task) {
+        this.task = task;
+    }
 
-    public String getTask(){return this.task;}
-    public boolean getIsDone(){return isDone;}
-    public int getId(){return id;}
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public String getTask() {
+        return this.task;
+    }
+
+    public boolean getCompleted() {
+        return completed;
+    }
+
 }
