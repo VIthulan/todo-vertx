@@ -6,12 +6,18 @@ This project builds todo apis using Vert.x with the following specifications of 
 1. First install Mongo db
 2. Start Mongo db service
 3. Make sure Mongodb service is running in port 27017
-3. Clone the project
+3. Clone the project : master branch
 4. Run `mvn clean package`
 5. Direct your terminal to `/todo-vertx/target`
 6. Run `java -jar todo.vertx-1.0-SNAPSHOT-fat.jar`
 
 Now your server will be started in `http://localhost:8080`
+
+##Deploying the application in Heroku
+1. Clone the [heroku-app branch](https://github.com/VIthulan/todo-vertx/tree/heroku-app)
+2. Open the terminal 
+3. heroku create (Assumption : Heroku environment is alreay been set) 
+4. git push heroku master
 
 ##Calling APIs
 
