@@ -11,15 +11,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Database client class which is used to manipulate data within database.
+ */
 public class DBclient {
     private static final Log log = LogFactory.getLog(DBclient.class);
 
     private MongoClient mongoClient;
-    private final String URI = "mongodb://localhost:27017";
-    private final String DB = "task_db";
-    private final String COLLECTION_NAME = "tasks";
-    private final String REMOVED_COLLECTION = "rmvd_task";
+    private final String URI = "mongodb://localhost:27017";     //Default mongodb port number is 27017
+    private final String DB = "task_db";                        //database name
+    private final String COLLECTION_NAME = "tasks";             //Tasks will be saved in this collection
+    private final String REMOVED_COLLECTION = "rmvd_task";      //Removed tasks from the 'tasks' collection will be saved here
 
+    /**
+     * It will initiate the mongo database client.
+     * @param vertx vertx from main verticle thread
+     * @return initiated mongoclient
+     */
     public MongoClient init(Vertx vertx){
         JsonObject config = Vertx.currentContext().config();
         String uri = config.getString("mongo_uri");
@@ -39,6 +47,11 @@ public class DBclient {
         return mongoClient;
     }
 
+    /**
+     * It will add data into a collection of mongo db
+     * @param mongoClient initiated mongoclient object from main verticle
+     * @param task Object that wants to be inserted into collection
+     */
     public void addData(MongoClient mongoClient, Tasks task){
         JsonObject taskJson = new JsonObject()
                 .put("task", task.getTask())
@@ -51,6 +64,11 @@ public class DBclient {
         });
     }
 
+    /**
+     * It can retrieve all data in a collection of database
+     * @param mongoClient initiated mongoclient object from main verticle
+     * @return Map of Objects with the key values of _ids
+     */
     public Map<String, Tasks> viewAllData(MongoClient mongoClient){
         Map<String,Tasks> tasksMap = new HashMap<>();
 
@@ -79,6 +97,12 @@ public class DBclient {
         return tasksMap;
     }
 
+    /**
+     * It will remove a data with specified id from the database and it will insert the deleted document into
+     * another collection for data safety
+     * @param mongoClient initiated mongoclient object from main verticle
+     * @param id _id of the document that has to be deleted.
+     */
     public void removeData (MongoClient mongoClient, String id){
         JsonObject query = new JsonObject().put("_id",id);
         mongoClient.find(COLLECTION_NAME,query,resultFind -> {
@@ -102,6 +126,11 @@ public class DBclient {
         });
     }
 
+    /**
+     * It will toggle the completed boolean for given _id
+     * @param mongoClient initiated mongoclient object from main verticle
+     * @param id _id of the document whose @param completed has to be toggled.
+     */
     public void modifyData (MongoClient mongoClient,String id){
         JsonObject query = new JsonObject().put("_id",id);
         mongoClient.find(COLLECTION_NAME,query,res -> {

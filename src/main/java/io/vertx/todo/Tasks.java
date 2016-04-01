@@ -1,7 +1,8 @@
 package io.vertx.todo;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
+/**
+ * Task object that will be used to save parameters
+ */
 public class Tasks {
     private boolean completed;
     private String task;

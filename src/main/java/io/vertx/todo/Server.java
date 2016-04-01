@@ -19,7 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * Main verticle that will create the server and handles REST calls.
+ */
 public class Server extends AbstractVerticle {
 
     private static final Log log = LogFactory.getLog(Server.class);
@@ -30,22 +32,30 @@ public class Server extends AbstractVerticle {
     @Override
     public void start(Future<Void> fut) throws Exception {
         dBclient = new DBclient();
-        mongoClient = dBclient.init(vertx);
+        mongoClient = dBclient.init(vertx);                         //Initiating mongo database
 
-        Router router = Router.router(vertx);
-        router.route("/").handler(routingContext -> {
+        Router router = Router.router(vertx);                       //Create the router object
+        router.route("/").handler(routingContext -> {               //Binding the message to / directory
             HttpServerResponse response = routingContext.response();
             response
                     .putHeader("content-type", "text/html")
-                    .end("<h1>Welcome to my Todo API from Vertx</h1>");
+                    .end("<h1>Welcome to my Todo API from Vertx</h1><br>" +
+                            "<p>Please refer to : https://github.com/VIthulan/todo-vertx </p><br>" +
+                            "<p>-Vithulan MV</p>");
         });
 
+        /**
+         * Handling rest calls with corresponding methods
+         */
         router.get("/api/tasks").handler(this::getAllTasks);
         router.route("/api/tasks*").handler(BodyHandler.create());
         router.post("/api/tasks").handler(this::addTask);
         router.delete("/api/tasks/:id").handler(this::deleteTask);
         router.put("/api/tasks/:id").handler(this::completed);
 
+        /**
+         * Creating the HTTP server at port 8080
+         */
         vertx
                 .createHttpServer()
                 .requestHandler(router::accept)
@@ -61,6 +71,10 @@ public class Server extends AbstractVerticle {
                 );
     }
 
+    /**
+     * It will retrieve all the data from the database to the server
+     * @param routingContext context of request from the server
+     */
     private void getAllTasks(RoutingContext routingContext) {
         Map<String, Tasks> tasksMap = new HashMap<>();
         JsonObject query = new JsonObject();
@@ -89,6 +103,10 @@ public class Server extends AbstractVerticle {
 
     }
 
+    /**
+     * It will add data into the database by calling DBclient function
+     * @param routingContext context of request from the server
+     */
     private void addTask(RoutingContext routingContext) {
         Tasks task = Json.decodeValue(routingContext.getBodyAsString(),
                 Tasks.class);
@@ -100,6 +118,10 @@ public class Server extends AbstractVerticle {
                 .end(Json.encodePrettily(task));
     }
 
+    /**
+     * It will delete a particular document for a given id by calling DBclient method
+     * @param routingContext context of request from the server
+     */
     private void deleteTask(RoutingContext routingContext) {
         String id = routingContext.request().getParam("id");
         if (id == null) {
@@ -110,9 +132,12 @@ public class Server extends AbstractVerticle {
         routingContext.response().setStatusCode(204).end();
     }
 
+    /**
+     * It will toggle the @param completed for a given _id by calling DBclient method
+     * @param routingContext context of request from the server
+     */
     private void completed(RoutingContext routingContext) {
         final String id = routingContext.request().getParam("id");
-        //JsonObject json = routingContext.getBodyAsJson();
         if (id == null ) {
             routingContext.response().setStatusCode(400).end();
         } else {
