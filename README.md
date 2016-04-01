@@ -22,7 +22,7 @@ This project builds todo apis using Vert.x with the following specifications of 
 "completed":"true"
 }
 ```
-3. View the sent request in `http://l{$YOUR_HEROKU_APP_URL}/api/tasks` in your browser.
+3. View the sent request in `http://{$YOUR_HEROKU_APP_URL}/api/tasks` in your browser.
 4. Like vice you can Add tasks, Delete tasks, Modify Tasks and View tasks.
 
 ##Available APIS
