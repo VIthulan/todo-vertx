@@ -1,5 +1,5 @@
 # Todo-vertx
-This project builds todo apis using Vert.x with the following specifications of [ToDo backend](http://todobackend.com/).
+This project builds todo apis using Vert.x with the following specifications of [Todo-backend](http://todobackend.com/).
 
 ## Installation
 
