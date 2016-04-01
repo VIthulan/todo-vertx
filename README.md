@@ -41,6 +41,6 @@ Now your server will be started in `http://localhost:8080`
 ##Contact 
 The best way for potential contributors to contact is [posting a message in my issue tracker](https://github.com/VIthulan/todo-vertx/issues/new) 
 
-Feel free to contribute for any bugs or for improvemet of an new feature
+Feel free to contribute for any bugs or for improvemet of a new feature
 
 -Vithulan MV
