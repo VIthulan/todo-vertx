@@ -69,7 +69,7 @@ public class Server extends AbstractVerticle {
                             }
                         }
                 );*/
-        vertx.createHttpServer().requestHandler(req -> req.response().end("Hello World!"))
+        vertx.createHttpServer().requestHandler(router::accept)
                 .listen(
                         Integer.getInteger("http.port"), System.getProperty("http.address", "0.0.0.0"));
     }
