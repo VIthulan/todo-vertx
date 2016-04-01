@@ -56,7 +56,7 @@ public class Server extends AbstractVerticle {
         /**
          * Creating the HTTP server at port 8080
          */
-        vertx
+        /*vertx
                 .createHttpServer()
                 .requestHandler(router::accept)
                 .listen(
@@ -68,7 +68,10 @@ public class Server extends AbstractVerticle {
                                 fut.fail(result.cause());
                             }
                         }
-                );
+                );*/
+        vertx.createHttpServer().requestHandler(req -> req.response().end("Hello World!"))
+                .listen(
+                        Integer.getInteger("http.port"), System.getProperty("http.address", "0.0.0.0"));
     }
 
     /**
