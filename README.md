@@ -1,36 +1,35 @@
 # Todo-vertx
-This project builds todo apis using Vert.x with the following specifications of [ToDo backend](http://todobackend.com/).
+This project builds todo apis using Vert.x with the following specifications of [Todo-backend](http://todobackend.com/).
 
-## Installation
+##Deploying the application in Heroku
+1. Clone the [heroku-app branch](https://github.com/VIthulan/todo-vertx/tree/heroku-app)
+2. Open the terminal 
+3. heroku create (Assumption : Heroku environment is alreay been set) 
+4. git push heroku master
 
-1. First install Mongo db
-2. Start Mongo db service
-3. Make sure Mongodb service is running in port 27017
-3. Clone the project
-4. Run `mvn clean package`
-5. Direct your terminal to `/todo-vertx/target`
-6. Run `java -jar todo.vertx-1.0-SNAPSHOT-fat.jar`
-
-Now your server will be started in `http://localhost:8080`
+###Tips
+* Sometimes you may not able to push to the heroku master, in that case create a git remote heroku for git repo created in step 3
+* After deployemnt successfully completed, You can open the application in the URL that shown in step 3
+* If anything doesn't work please check the log files in your application page and let me know.
 
 ##Calling APIs
 
 1. Open a Rest client in your browser
-2. Send a `POST` request to `http://localhost:8080/api/tasks` with the following JSON context
+2. Send a `POST` request to `http://{$YOUR_HEROKU_APP_URL}/api/tasks` with the following JSON context
 ```
 {
 "task":"Doing GSoC 2016",
 "completed":"true"
 }
 ```
-3. View the sent request in `http://localhost:8080/api/tasks` in your browser.
+3. View the sent request in `http://l{$YOUR_HEROKU_APP_URL}/api/tasks` in your browser.
 4. Like vice you can Add tasks, Delete tasks, Modify Tasks and View tasks.
 
 ##Available APIS
-* `GET` `http://localhost:8080/api/tasks` : Get all the Tasks stored in DB
-* `POST` `http://localhost:8080/api/tasks` : Add a new task
-* `PUT` `http://localhost:8080/api/tasks/:id` : Update a task whether it is done or not
-* `DELETE` `http://localhost:8080/api/tasks/:id` : Delete a task
+* `GET` `http://{$YOUR_HEROKU_APP_URL}/api/tasks` : Get all the Tasks stored in DB
+* `POST` `http://{$YOUR_HEROKU_APP_URL}/api/tasks` : Add a new task
+* `PUT` `http://{$YOUR_HEROKU_APP_URL}/api/tasks/:id` : Update a task whether it is done or not
+* `DELETE` `http://{$YOUR_HEROKU_APP_URL}/api/tasks/:id` : Delete a task
 
 ##Simple Architecture of todo-vertx
 <img src = "http://i68.tinypic.com/303er5x.png">
