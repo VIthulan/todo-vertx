@@ -18,7 +18,8 @@ public class DBclient {
     private static final Log log = LogFactory.getLog(DBclient.class);
 
     private MongoClient mongoClient;
-    private final String URI = "mongodb://0.0.0.0:27017";     //Default mongodb port number is 27017
+   // private final String URI = "mongodb://0.0.0.0:27017";     //Default mongodb port number is 27017
+    private final String URI = "mongodb://todo-vertx:todo@123@ds011880.mlab.com:11880/task_db";     //Cloud database
     private final String DB = "task_db";                        //database name
     private final String COLLECTION_NAME = "tasks";             //Tasks will be saved in this collection
     private final String REMOVED_COLLECTION = "rmvd_task";      //Removed tasks from the 'tasks' collection will be saved here
