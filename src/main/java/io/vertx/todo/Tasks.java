@@ -7,6 +7,7 @@ public class Tasks {
     private boolean completed;
     private String title;
     private int order = 0;
+    private String url = "/";
 
     public Tasks(String task, boolean completed) {
         this.completed = completed;
@@ -16,6 +17,13 @@ public class Tasks {
     public Tasks() {
     }
 
+    public void setUrl(String url){
+        this.url=url;
+    }
+
+    public String getUrl(){
+        return url;
+    }
     public void setOrder(int order){
         this.order=order;
     }
