@@ -55,7 +55,7 @@ public class DBclient {
      */
     public void addData(MongoClient mongoClient, Tasks task){
         JsonObject taskJson = new JsonObject()
-                .put("task", task.getTask())
+                .put("task", task.getTitle())
                 .put("completed",task.getCompleted());
 
         mongoClient.insert(COLLECTION_NAME, taskJson, res -> {
@@ -81,7 +81,7 @@ public class DBclient {
                 for (JsonObject json : res.result()) {
                     Tasks tasks = new Tasks();
                     tasks.setCompleted(json.getBoolean("completed"));
-                    tasks.setTask(json.getString("task"));
+                    tasks.setTitle(json.getString("task"));
                     tasksMap.put(json.getString("_id"), tasks);
                     jsonObject.mergeIn(json);
                     log.info(json.encodePrettily());
@@ -139,11 +139,11 @@ public class DBclient {
                 List<JsonObject> jsonObjects = res.result();
                 JsonObject taskJson = jsonObjects.get(0);
                 boolean completed = taskJson.getBoolean("completed");
-                String task = taskJson.getString("task");
+                String title = taskJson.getString("title");
                 JsonObject modifiedJson = new JsonObject()
                         .put("_id",id)
                         .put("completed",!completed)
-                        .put("task",task);
+                        .put("title",title);
                 mongoClient.save(COLLECTION_NAME,modifiedJson,saveResult -> {
                     if(saveResult.succeeded()){
                         log.info("Successfully modified "+ id);

@@ -5,26 +5,26 @@ package io.vertx.todo;
  */
 public class Tasks {
     private boolean completed;
-    private String task;
+    private String title;
 
     public Tasks(String task, boolean completed) {
         this.completed = completed;
-        this.task = task;
+        this.title = task;
     }
 
     public Tasks() {
     }
 
-    public void setTask(String task) {
-        this.task = task;
+    public void setTitle(String task) {
+        this.title = task;
     }
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }
 
-    public String getTask() {
-        return this.task;
+    public String getTitle() {
+        return this.title;
     }
 
     public boolean getCompleted() {

@@ -88,7 +88,7 @@ public class Server extends AbstractVerticle {
                 for (JsonObject json : res.result()) {
                     Tasks tasks = new Tasks();
                     tasks.setCompleted(json.getBoolean("completed"));
-                    tasks.setTask(json.getString("task"));
+                    tasks.setTitle(json.getString("title"));
                     tasksMap.put(json.getString("_id"), tasks);
                     jsonObject.mergeIn(json);
                     log.info(json.encodePrettily());
