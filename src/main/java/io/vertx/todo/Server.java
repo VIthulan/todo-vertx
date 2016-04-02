@@ -38,14 +38,14 @@ public class Server extends AbstractVerticle {
         mongoClient = dBclient.init(vertx);                         //Initiating mongo database
 
         Router router = Router.router(vertx);                       //Create the router object
-        router.route("/").handler(routingContext -> {               //Binding the message to / directory
+        /*router.route("/").handler(routingContext -> {               //Binding the message to / directory
             HttpServerResponse response = routingContext.response();
             response
                     .putHeader("content-type", "text/html")
                     .end("<h1>Welcome to my Todo API from Vertx</h1><br>" +
                             "<p>Please refer to : https://github.com/VIthulan/todo-vertx </p><br>" +
                             "<p>-Vithulan MV</p>");
-        });
+        });*/
 
         /**
          * Handling rest calls with corresponding methods
