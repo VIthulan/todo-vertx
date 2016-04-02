@@ -4,6 +4,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
@@ -12,6 +13,7 @@ import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.util.DBclient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,6 +52,14 @@ public class Server extends AbstractVerticle {
         /**
          * Handling rest calls with corresponding methods
          */
+        router.route().handler(CorsHandler.create("*")
+                .allowedMethod(HttpMethod.GET)
+                .allowedMethod(HttpMethod.POST)
+                .allowedMethod(HttpMethod.OPTIONS)
+                .allowedMethod(HttpMethod.PATCH)
+                .allowedMethod(HttpMethod.DELETE)
+                .allowedMethod(HttpMethod.PUT)
+                .allowedHeader("Content-Type"));
         router.get("/").handler((context) -> context.reroute("/api/tasks"));
         router.get("/api/tasks").handler(this::getAllTasks);
         router.get("/api/tasks/:id").handler(this::getTask);
