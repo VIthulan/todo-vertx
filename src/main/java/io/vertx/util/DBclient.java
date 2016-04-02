@@ -1,8 +1,10 @@
 package io.vertx.util;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
+import io.vertx.ext.web.RoutingContext;
 import io.vertx.todo.Tasks;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +55,7 @@ public class DBclient {
      * @param mongoClient initiated mongoclient object from main verticle
      * @param task Object that wants to be inserted into collection
      */
-    public void addData(MongoClient mongoClient, Tasks task){
+    public void addData(MongoClient mongoClient, Tasks task, RoutingContext routingContext){
         JsonObject taskJson = new JsonObject()
                 .put("task", task.getTitle())
                 .put("completed",task.getCompleted());
@@ -61,6 +63,13 @@ public class DBclient {
         mongoClient.insert(COLLECTION_NAME, taskJson, res -> {
             if (res.succeeded()) {
                 log.info("Successfully inserted: " + res.result());
+                routingContext.response()
+                        .setStatusCode(201)
+                        .putHeader("content-type", "application/json; charset=utf-8")
+                        .end(taskJson.encodePrettily());
+            }
+            else{
+                routingContext.response().setStatusCode(500).end();
             }
         });
     }
@@ -99,12 +108,36 @@ public class DBclient {
     }
 
     /**
+     * get a specific task from collection with given id
+     * @param mongoClient initiated mongoclient object from main verticle
+     * @param id _id of the document that has to be get
+     * @param routingContext routing context from server
+     */
+    public void getTask (MongoClient mongoClient,String id,RoutingContext routingContext){
+        JsonObject query = new JsonObject().put("_id",id);
+        mongoClient.findOne(COLLECTION_NAME, query, new JsonObject(), result -> {
+            if (result.succeeded()) {
+                if (result.result() == null) {
+                    routingContext.response().setStatusCode(500).end();
+                } else
+                    routingContext.response()
+                            .putHeader("content-type", "application/json; charset=utf-8")
+                            .end(result.result().encodePrettily());
+            }
+            if (result.failed()) {
+                routingContext.response().setStatusCode(500).end();
+            }
+        });
+    }
+
+
+    /**
      * It will remove a data with specified id from the database and it will insert the deleted document into
      * another collection for data safety
      * @param mongoClient initiated mongoclient object from main verticle
      * @param id _id of the document that has to be deleted.
      */
-    public void removeData (MongoClient mongoClient, String id){
+    public void removeData (MongoClient mongoClient, String id, RoutingContext routingContext){
         JsonObject query = new JsonObject().put("_id",id);
         mongoClient.find(COLLECTION_NAME,query,resultFind -> {
             if(resultFind.succeeded()){
@@ -115,13 +148,16 @@ public class DBclient {
                         log.info("Successfully inserted into deleted collection: "+id);
                     }
                 });
+
             }
         });
         mongoClient.remove(COLLECTION_NAME,query,res -> {
            if(res.succeeded()){
                log.info("Successfully removed id "+id);
+               routingContext.response().end();
            }
             else{
+               routingContext.response().setStatusCode(500).end();
                log.error(res.cause());
            }
         });
@@ -132,7 +168,7 @@ public class DBclient {
      * @param mongoClient initiated mongoclient object from main verticle
      * @param id _id of the document whose @param completed has to be toggled.
      */
-    public void modifyData (MongoClient mongoClient,String id){
+    public void modifyData (MongoClient mongoClient,String id, RoutingContext routingContext){
         JsonObject query = new JsonObject().put("_id",id);
         mongoClient.find(COLLECTION_NAME,query,res -> {
             if(res.succeeded()){
@@ -147,6 +183,10 @@ public class DBclient {
                 mongoClient.save(COLLECTION_NAME,modifiedJson,saveResult -> {
                     if(saveResult.succeeded()){
                         log.info("Successfully modified "+ id);
+                        getTask(mongoClient,id,routingContext);
+                    }
+                    else{
+                        routingContext.response().setStatusCode(500).end();
                     }
                 });
             }
