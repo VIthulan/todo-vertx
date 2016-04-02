@@ -20,7 +20,6 @@ public class DBclient {
     private static final Log log = LogFactory.getLog(DBclient.class);
 
     private MongoClient mongoClient;
-   // private final String URI = "mongodb://0.0.0.0:27017";     //Default mongodb port number is 27017
     private final String URI = "mongodb://admin:admin@ds011880.mlab.com:11880/task_db";     //Cloud database
     private final String DB = "task_db";                        //database name
     private final String COLLECTION_NAME = "tasks";             //Tasks will be saved in this collection
@@ -67,10 +66,10 @@ public class DBclient {
                 log.info("Successfully inserted: " + res.result());
                 JsonObject jsonWithURL = new JsonObject()
                         .put("title", task.getTitle())
-                        .put("completed",task.getCompleted())
+                        .put("completed", task.getCompleted())
                         .put("order",task.getOrder())
                         .put("url",task.getUrl()+"/"+res.result())
-                        .put("_id",res.result());
+                        .put("_id", res.result());
 
                 mongoClient.save(COLLECTION_NAME,jsonWithURL,savedResult -> {
                     if(savedResult.succeeded()) {
@@ -111,9 +110,6 @@ public class DBclient {
                     jsonObject.mergeIn(json);
                     log.info(json.encodePrettily());
                 }
-               /* routingContext.response()
-                        .putHeader("content-type", "application/json; charset=utf-8")
-                        .end(jsonObject.encodePrettily());*/
             } else {
                 res.cause().printStackTrace();
                 log.error("Error while retrieving all data");
@@ -197,34 +193,13 @@ public class DBclient {
                 routingContext.response().setStatusCode(500).end();
             }
         });
-        /*mongoClient.find(COLLECTION_NAME,query,res -> {
-            if(res.succeeded()){
-                List<JsonObject> jsonObjects = res.result();
-                JsonObject taskJson = jsonObjects.get(0);
-                boolean completed = taskJson.getBoolean("completed");
-                String title = taskJson.getString("title");
-                int order = taskJson.getInteger("order");
-                String url = taskJson.getString("url");
-                JsonObject modifiedJson = new JsonObject()
-                        .put("_id",id)
-                        .put("completed",!completed)
-                        .put("title",title)
-                        .put("order",order)
-                        .put("url",url);
-
-                mongoClient.save(COLLECTION_NAME,modifiedJson,saveResult -> {
-                    if(saveResult.succeeded()){
-                        log.info("Successfully modified "+ id);
-                        getTask(mongoClient,id,routingContext);
-                    }
-                    else{
-                        routingContext.response().setStatusCode(500).end();
-                    }
-                });
-            }
-        });*/
     }
 
+    /**
+     * delete all data in the collection
+     * @param mongoClient initiated mongoclient object from main verticle
+     * @param routingContext context data from the server
+     */
     public void deleteAll (MongoClient mongoClient,RoutingContext routingContext){
         mongoClient.dropCollection(COLLECTION_NAME, result -> {
             if (result.succeeded()) {

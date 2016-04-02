@@ -18,9 +18,6 @@ import io.vertx.util.DBclient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Main verticle that will create the server and handles REST calls.
@@ -32,7 +29,6 @@ public class Server extends AbstractVerticle {
     private DBclient dBclient;
     private MongoClient mongoClient;
     private final String COLLECTION_NAME = "tasks";             //Tasks will be saved in this collection
-    private final String REMOVED_COLLECTION = "rmvd_task";      //Removed tasks from the 'tasks' collection will be saved here
 
     @Override
     public void start(Future<Void> fut) throws Exception {
@@ -40,14 +36,6 @@ public class Server extends AbstractVerticle {
         mongoClient = dBclient.init(vertx);                         //Initiating mongo database
 
         Router router = Router.router(vertx);                       //Create the router object
-        /*router.route("/").handler(routingContext -> {               //Binding the message to / directory
-            HttpServerResponse response = routingContext.response();
-            response
-                    .putHeader("content-type", "text/html")
-                    .end("<h1>Welcome to my Todo API from Vertx</h1><br>" +
-                            "<p>Please refer to : https://github.com/VIthulan/todo-vertx </p><br>" +
-                            "<p>-Vithulan MV</p>");
-        });*/
 
         /**
          * Handling rest calls with corresponding methods
@@ -83,19 +71,6 @@ public class Server extends AbstractVerticle {
         /**
          * Creating the HTTP server at port 8080
          */
-        /*vertx
-                .createHttpServer()
-                .requestHandler(router::accept)
-                .listen(
-                        config().getInteger("http.port", 8080),
-                        result -> {
-                            if (result.succeeded()) {
-                                fut.complete();
-                            } else {
-                                fut.fail(result.cause());
-                            }
-                        }
-                );*/
         vertx.createHttpServer().requestHandler(router::accept)
                 .listen(
                         Integer.getInteger("http.port"), System.getProperty("http.address", "0.0.0.0"));
@@ -175,6 +150,10 @@ public class Server extends AbstractVerticle {
         }
     }
 
+    /**
+     * Delete the collection
+     * @param routingContext context of request from the server
+     */
     private void deleteAllTasks(RoutingContext routingContext){
         dBclient.deleteAll(mongoClient,routingContext);
     }
