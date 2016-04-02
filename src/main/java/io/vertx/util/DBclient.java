@@ -66,11 +66,11 @@ public class DBclient {
             if (res.succeeded()) {
                 log.info("Successfully inserted: " + res.result());
                 JsonObject jsonWithURL = new JsonObject()
-                        .put("_id",res.result())
                         .put("title", task.getTitle())
                         .put("completed",task.getCompleted())
                         .put("order",task.getOrder())
-                        .put("url",task.getUrl()+"/"+res.result());
+                        .put("url",task.getUrl()+"/"+res.result())
+                        .put("_id",res.result());
 
                 mongoClient.save(COLLECTION_NAME,jsonWithURL,savedResult -> {
                     if(savedResult.succeeded()) {
