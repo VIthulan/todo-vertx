@@ -19,6 +19,9 @@ Now your server will be started in `http://localhost:8080`
 3. heroku create (Assumption : Heroku environment is alreay been set) 
 4. git push heroku master
 
+## Project is live!
+Please check out [https://todo-vertx.herokuapp.com/api/tasks](https://todo-vertx.herokuapp.com/api/tasks)
+
 ##Calling APIs
 
 1. Open a Rest client in your browser
