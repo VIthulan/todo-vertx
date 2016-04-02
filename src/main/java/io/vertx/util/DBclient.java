@@ -185,8 +185,19 @@ public class DBclient {
      * @param id _id of the document whose @param completed has to be toggled.
      */
     public void modifyData (MongoClient mongoClient,String id, RoutingContext routingContext){
-        JsonObject query = new JsonObject().put("_id",id);
-        mongoClient.find(COLLECTION_NAME,query,res -> {
+        JsonObject responseBody = routingContext.getBodyAsJson();
+        JsonObject updateData = new JsonObject().put("$set",responseBody);
+        JsonObject query = new JsonObject().put("_id", id);
+        mongoClient.update(COLLECTION_NAME,query,updateData,response-> {
+            if(response.succeeded()){
+                log.info("Successfully modified "+ id);
+                getTask(mongoClient,id,routingContext);
+            }
+            else{
+                routingContext.response().setStatusCode(500).end();
+            }
+        });
+        /*mongoClient.find(COLLECTION_NAME,query,res -> {
             if(res.succeeded()){
                 List<JsonObject> jsonObjects = res.result();
                 JsonObject taskJson = jsonObjects.get(0);
@@ -211,7 +222,7 @@ public class DBclient {
                     }
                 });
             }
-        });
+        });*/
     }
 
     public void deleteAll (MongoClient mongoClient,RoutingContext routingContext){
