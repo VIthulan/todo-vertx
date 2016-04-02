@@ -193,4 +193,15 @@ public class DBclient {
             }
         });
     }
+
+    public void deleteAll (MongoClient mongoClient,RoutingContext routingContext){
+        mongoClient.dropCollection(COLLECTION_NAME, result -> {
+            if (result.succeeded()) {
+                routingContext.response().end();
+            }
+            if (result.failed()) {
+                routingContext.response().setStatusCode(500).end();
+            }
+        });
+    }
 }
