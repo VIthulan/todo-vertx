@@ -178,10 +178,15 @@ public class DBclient {
                 JsonObject taskJson = jsonObjects.get(0);
                 boolean completed = taskJson.getBoolean("completed");
                 String title = taskJson.getString("title");
+                int order = taskJson.getInteger("order");
+                String url = taskJson.getString("url");
                 JsonObject modifiedJson = new JsonObject()
                         .put("_id",id)
                         .put("completed",!completed)
-                        .put("title",title);
+                        .put("title",title)
+                        .put("order",order)
+                        .put("url",url);
+
                 mongoClient.save(COLLECTION_NAME,modifiedJson,saveResult -> {
                     if(saveResult.succeeded()){
                         log.info("Successfully modified "+ id);
