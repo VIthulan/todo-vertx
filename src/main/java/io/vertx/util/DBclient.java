@@ -58,7 +58,8 @@ public class DBclient {
     public void addData(MongoClient mongoClient, Tasks task, RoutingContext routingContext){
         JsonObject taskJson = new JsonObject()
                 .put("title", task.getTitle())
-                .put("completed",task.getCompleted());
+                .put("completed",task.getCompleted())
+                .put("order",task.getOrder());
 
         mongoClient.insert(COLLECTION_NAME, taskJson, res -> {
             if (res.succeeded()) {
