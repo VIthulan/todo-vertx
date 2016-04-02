@@ -59,12 +59,14 @@ public class DBclient {
         JsonObject taskJson = new JsonObject()
                 .put("title", task.getTitle())
                 .put("completed",task.getCompleted())
-                .put("order",task.getOrder());
+                .put("order",task.getOrder())
+                .put("url",task.getUrl());
 
         mongoClient.insert(COLLECTION_NAME, taskJson, res -> {
             if (res.succeeded()) {
                 log.info("Successfully inserted: " + res.result());
                 JsonObject jsonWithURL = new JsonObject()
+                        .put("_id",res.result())
                         .put("title", task.getTitle())
                         .put("completed",task.getCompleted())
                         .put("order",task.getOrder())
