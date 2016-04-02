@@ -77,7 +77,7 @@ public class DBclient {
                         routingContext.response()
                                 .setStatusCode(201)
                                 .putHeader("content-type", "application/json; charset=utf-8")
-                                .end(taskJson.encodePrettily());
+                                .end(jsonWithURL.encodePrettily());
                     }
                     else{
                         routingContext.response().setStatusCode(500).end();
