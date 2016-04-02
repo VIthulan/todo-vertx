@@ -59,16 +59,28 @@ public class DBclient {
         JsonObject taskJson = new JsonObject()
                 .put("title", task.getTitle())
                 .put("completed",task.getCompleted())
-                .put("order",task.getOrder())
-                .put("url",task.getUrl());
+                .put("order",task.getOrder());
 
         mongoClient.insert(COLLECTION_NAME, taskJson, res -> {
             if (res.succeeded()) {
                 log.info("Successfully inserted: " + res.result());
-                routingContext.response()
-                        .setStatusCode(201)
-                        .putHeader("content-type", "application/json; charset=utf-8")
-                        .end(taskJson.encodePrettily());
+                JsonObject jsonWithURL = new JsonObject()
+                        .put("title", task.getTitle())
+                        .put("completed",task.getCompleted())
+                        .put("order",task.getOrder())
+                        .put("url",task.getUrl()+"/"+res.result());
+
+                mongoClient.save(COLLECTION_NAME,jsonWithURL,savedResult -> {
+                    if(savedResult.succeeded()) {
+                        routingContext.response()
+                                .setStatusCode(201)
+                                .putHeader("content-type", "application/json; charset=utf-8")
+                                .end(taskJson.encodePrettily());
+                    }
+                    else{
+                        routingContext.response().setStatusCode(500).end();
+                    }
+                });
             }
             else{
                 routingContext.response().setStatusCode(500).end();

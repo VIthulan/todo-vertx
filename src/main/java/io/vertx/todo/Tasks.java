@@ -7,7 +7,7 @@ public class Tasks {
     private boolean completed;
     private String title;
     private int order = 0;
-    private String url = "/";
+    private String url = "https://todo-vertx.herokuapp.com/api/tasks";
 
     public Tasks(String task, boolean completed) {
         this.completed = completed;
