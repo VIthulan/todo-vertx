@@ -57,7 +57,7 @@ public class DBclient {
      */
     public void addData(MongoClient mongoClient, Tasks task, RoutingContext routingContext){
         JsonObject taskJson = new JsonObject()
-                .put("task", task.getTitle())
+                .put("title", task.getTitle())
                 .put("completed",task.getCompleted());
 
         mongoClient.insert(COLLECTION_NAME, taskJson, res -> {
@@ -90,7 +90,7 @@ public class DBclient {
                 for (JsonObject json : res.result()) {
                     Tasks tasks = new Tasks();
                     tasks.setCompleted(json.getBoolean("completed"));
-                    tasks.setTitle(json.getString("task"));
+                    tasks.setTitle(json.getString("title"));
                     tasksMap.put(json.getString("_id"), tasks);
                     jsonObject.mergeIn(json);
                     log.info(json.encodePrettily());
