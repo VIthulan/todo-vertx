@@ -74,7 +74,7 @@ public class Server extends AbstractVerticle {
         });
         router.post("/api/tasks").handler(this::addTask);
         router.delete("/api/tasks/:id").handler(this::deleteTask);
-        router.delete("/todos/").handler(this::deleteAllTasks);
+        router.delete("/api/tasks").handler(this::deleteAllTasks);
         router.patch("/api/tasks/:id").handler(this::completed);
         router.put("/api/tasks/:id").handler(this::completed);
         router.options("/api/tasks").handler((handler) -> handler.response().end());
