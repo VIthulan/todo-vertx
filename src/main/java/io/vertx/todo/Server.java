@@ -49,9 +49,19 @@ public class Server extends AbstractVerticle {
          */
         router.get("/api/tasks").handler(this::getAllTasks);
         router.route("/api/tasks*").handler(BodyHandler.create());
+        router.route().handler((routingContext) -> {
+            routingContext.response()
+                    .putHeader("Access-Control-Allow-Origin", "*")
+                    .putHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH")
+                    .putHeader("Access-Control-Allow-Headers", "x-requested-with, origin, content-type, accept")
+                    .putHeader("Access-Control-Max-Age", "3600");
+            routingContext.next();
+        });
         router.post("/api/tasks").handler(this::addTask);
         router.delete("/api/tasks/:id").handler(this::deleteTask);
-        router.put("/api/tasks/:id").handler(this::completed);
+        router.patch("/api/tasks/:id").handler(this::completed);
+        router.options("/api/tasks").handler((handler) -> handler.response().end());
+        router.options("/api/tasks/:id").handler((handler) -> handler.response().end());
 
         /**
          * Creating the HTTP server at port 8080
