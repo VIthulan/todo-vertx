@@ -50,6 +50,7 @@ public class Server extends AbstractVerticle {
         /**
          * Handling rest calls with corresponding methods
          */
+        router.get("/").handler((context) -> context.reroute("/api/tasks"));
         router.get("/api/tasks").handler(this::getAllTasks);
         router.get("/api/tasks/:id").handler(this::getTask);
         router.route("/api/tasks*").handler(BodyHandler.create());
