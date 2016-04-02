@@ -7,6 +7,9 @@ This project builds todo apis using Vert.x with the following specifications of 
 3. heroku create (Assumption : Heroku environment is alreay been set) 
 4. git push heroku master
 
+## Project is live!
+Please check out [https://todo-vertx.herokuapp.com/api/tasks](https://todo-vertx.herokuapp.com/api/tasks)
+
 ###Tips
 * Sometimes you may not able to push to the heroku master, in that case create a git remote heroku for git repo created in step 3
 * After deployemnt successfully completed, You can open the application in the URL that shown in step 3
