@@ -1,6 +1,8 @@
 # Todo-vertx
 This project builds todo apis using Vert.x with the following specifications of [Todo-backend](http://todobackend.com/).
 
+Project is merged in Todo-backend Site!! Please checkout [Todo-vertx from Vithulan](http://www.todobackend.com/client/index.html?https://todo-vertx.herokuapp.com/api/tasks).
+
 ##Deploying the application in Heroku
 1. Clone the [heroku-app branch](https://github.com/VIthulan/todo-vertx/tree/heroku-app)
 2. Open the terminal 
